@@ -1,9 +1,24 @@
+# To build: docker build -t spinup-nikhil .
+# To run: docker run -i -t spinup-nikhil /bin/bash
+
 FROM continuumio/anaconda3
 
 # example call of docker RUN command see more at: https://docs.docker.com/engine/reference/builder/
 RUN apt-get update --fix-missing && apt-get install -y g++ gcc htop
 
-# need do the following
+# install opengl
+RUN apt-get --yes --force-yes install python-opengl
+
+# installing openmpi
+RUN apt-get --yes --force-yes install libopenmpi-dev
+
 # clone spinning up
+RUN git clone https://github.com/openai/spinningup.git
+
 # install dependencies for spinning up
+# It seems: I only needed 1 dependency to install spinningup!
+RUN pip install pyqt5==5.12.3
+
 # install spinning up using pip
+RUN cd spinningup && pip install -e .
+
