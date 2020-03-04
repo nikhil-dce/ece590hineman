@@ -1,5 +1,6 @@
 # To build: docker build -t spinup-nikhil .
 # To run: docker run -i -t spinup-nikhil /bin/bash
+# docker run --mount type=bind,source=/home/nikhil/ece590hineman,target=/host -it spinup-nikhil
 
 FROM continuumio/anaconda3
 
@@ -21,4 +22,3 @@ RUN pip install pyqt5==5.12.3
 
 # install spinning up using pip
 RUN cd spinningup && pip install -e .
-
