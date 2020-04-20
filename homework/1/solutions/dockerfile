@@ -31,3 +31,9 @@ RUN pip install pyyaml
 
 # get ffmpeg
 RUN apt-get --yes --force-yes install ffmpeg
+
+# install gputil
+RUN pip install gputil
+
+# install torchvision (used in Pong DQN HW)
+RUN pip install torchvision==0.4.2
