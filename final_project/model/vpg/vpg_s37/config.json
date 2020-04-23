@@ -6,21 +6,21 @@
         ]
     },
     "actor_critic":	"MLPActorCritic",
-    "env_fn":	"<function <lambda> at 0x7f0aa0e4ecb0>",
+    "env_fn":	"<function <lambda> at 0x7f12dc543680>",
     "epochs":	100,
     "exp_name":	"vpg",
     "gamma":	0.9,
     "lam":	0.97,
     "logger":	{
-        "<spinup.utils.logx.EpochLogger object at 0x7f0a9af48410>":	{
+        "<spinup.utils.logx.EpochLogger object at 0x7f12dc531850>":	{
             "epoch_dict":	{},
             "exp_name":	"vpg",
             "first_row":	true,
             "log_current_row":	{},
             "log_headers":	[],
-            "output_dir":	"model/vpg/vpg_s1234",
+            "output_dir":	"model/vpg/vpg_s37",
             "output_file":	{
-                "<_io.TextIOWrapper name='model/vpg/vpg_s1234/progress.txt' mode='w' encoding='UTF-8'>":	{
+                "<_io.TextIOWrapper name='model/vpg/vpg_s37/progress.txt' mode='w' encoding='UTF-8'>":	{
                     "mode":	"w"
                 }
             }
@@ -28,12 +28,12 @@
     },
     "logger_kwargs":	{
         "exp_name":	"vpg",
-        "output_dir":	"model/vpg/vpg_s1234"
+        "output_dir":	"model/vpg/vpg_s37"
     },
     "max_ep_len":	100,
     "pi_lr":	0.0003,
     "save_freq":	10,
-    "seed":	12,
+    "seed":	37,
     "steps_per_epoch":	100,
     "train_v_iters":	80,
     "vf_lr":	0.001

@@ -187,8 +187,8 @@ def vpg(env_fn, actor_critic=core.MLPActorCritic, ac_kwargs=dict(),  seed=0,
 
     # Instantiate environment
     env = env_fn()
-    # obs_dim = env.observation_space.shape
-    obs_dim = env.observation_space.n
+    obs_dim = env.observation_space.shape
+    # obs_dim = env.observation_space.n
     act_dim = env.action_space.shape
 
     # Create actor-critic module
@@ -310,7 +310,7 @@ def vpg(env_fn, actor_critic=core.MLPActorCritic, ac_kwargs=dict(),  seed=0,
         # Perform VPG update!
         update()
 
-        if epoch % 500 == 0:
+        if epoch % 10 == 0:
             # Log info about epoch
             logger.log_tabular('Epoch', epoch)
             logger.log_tabular('EpRet', with_min_and_max=True)
