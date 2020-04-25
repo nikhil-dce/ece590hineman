@@ -58,15 +58,15 @@ class BayesLinear(Module):
             self.bias_log_sigma.data.fill_(self.prior_log_sigma)
          
         # Initialization method of the original torch nn.linear.
-#         init.kaiming_uniform_(self.weight_mu, a=math.sqrt(5))
-#         self.weight_log_sigma.data.fill_(self.prior_log_sigma)
-        
-#         if self.bias :
-#             fan_in, _ = init._calculate_fan_in_and_fan_out(self.weight_mu)
-#             bound = 1 / math.sqrt(fan_in)
-#             init.uniform_(self.bias_mu, -bound, bound)
-            
-#             self.bias_log_sigma.data.fill_(self.prior_log_sigma)
+        #         init.kaiming_uniform_(self.weight_mu, a=math.sqrt(5))
+        #         self.weight_log_sigma.data.fill_(self.prior_log_sigma)
+
+        #         if self.bias :
+        #             fan_in, _ = init._calculate_fan_in_and_fan_out(self.weight_mu)
+        #             bound = 1 / math.sqrt(fan_in)
+        #             init.uniform_(self.bias_mu, -bound, bound)
+
+        #             self.bias_log_sigma.data.fill_(self.prior_log_sigma)
 
     def freeze(self) :
         self.weight_eps = torch.randn_like(self.weight_log_sigma)

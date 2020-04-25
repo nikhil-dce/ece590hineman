@@ -7,6 +7,9 @@ import torch.nn as nn
 from spinup.algos.pytorch.vpg.core import *
 
 import numpy as np
+from algos.vpg_source.bnn import BayesLinear
+
+import math
 
 class MLPActorCritic(nn.Module):
 
@@ -38,7 +41,7 @@ class MLPActorCritic(nn.Module):
     def act(self, obs):
         return self.step(obs)[0]
 
-class BayesianMLPActorCritic(nn.Module):
+class BayesMLPActorCritic(nn.Module):
     
     def __init__(self, observation_space, action_space, 
                  hidden_sizes=(64,64), activation=nn.Tanh):
@@ -48,7 +51,7 @@ class BayesianMLPActorCritic(nn.Module):
         act_dim = action_space.shape
         
         self.pi = MLPGaussianActor(obs_dim[0], act_dim[0], hidden_sizes, activation)
-        self.v  = BayesianMLPCritic(obs_dim[0], hidden_sizes, activation)
+        self.v  = BayesMLPCritic(obs_dim[0], hidden_sizes, activation)
 
     def step(self, obs):
         with torch.no_grad():
@@ -61,19 +64,55 @@ class BayesianMLPActorCritic(nn.Module):
     def act(self, obs):
         return self.step(obs)[0]
 
-class BayesianMLPCritic(nn.Module):
+class BayesMLPCritic(nn.Module):
 
     def __init__(self, obs_dim, hidden_sizes, activation):
         super().__init__()
-        self.v_net = BayesianMLP([obs_dim] + list(hidden_sizes) + [1], activation)
+        self.v_net = BayesMLP([obs_dim] + list(hidden_sizes) + [1], activation)
 
     def forward(self, obs):
         return torch.squeeze(self.v_net(obs), -1) # Critical to ensure v has right shape.
 
+    def compute_kl(self):
+        
+        device = torch.device("cuda" if next(self.parameters()).is_cuda else "cpu")
+        kl = torch.Tensor([0]).to(device)
+        kl_sum = torch.Tensor([0]).to(device)
+        # n = torch.Tensor([0]).to(device)
 
-def BayesianMLP(sizes, activation, output_activation=nn.Identity):
+        for m in self.v_net.children():
+
+            if isinstance(m, BayesLinear):
+                kl = _kl_loss(m.weight_mu, m.weight_log_sigma, m.prior_mu, m.prior_log_sigma)
+                kl_sum += kl
+                # n += len(m.weight_mu.view(-1))
+
+                if m.bias :
+                    kl = _kl_loss(m.bias_mu, m.bias_log_sigma, m.prior_mu, m.prior_log_sigma)
+                    kl_sum += kl
+                    # n += len(m.bias_mu.view(-1))
+        
+        return kl_sum
+
+
+def BayesMLP(sizes, activation, output_activation=nn.Identity):
     layers = []
     for j in range(len(sizes)-1):
         act = activation if j < len(sizes)-2 else output_activation
-        layers += [nn.Linear(sizes[j], sizes[j+1]), act()]
+        layers += [BayesLinear(0.0, 1.0, sizes[j], sizes[j+1]), act()]
     return nn.Sequential(*layers)
+
+
+def _kl_loss(mu_0, log_sigma_0, mu_1, log_sigma_1) :
+    """
+    An method for calculating KL divergence between two Normal distribtuion.
+    Arguments:
+        mu_0 (Float) : mean of normal distribution.
+        log_sigma_0 (Float): log(standard deviation of normal distribution).
+        mu_1 (Float): mean of normal distribution.
+        log_sigma_1 (Float): log(standard deviation of normal distribution).
+
+    """
+    kl = log_sigma_1 - log_sigma_0 + \
+    (torch.exp(log_sigma_0)**2 + (mu_0-mu_1)**2)/(2*math.exp(log_sigma_1)**2) - 0.5
+    return kl.sum()

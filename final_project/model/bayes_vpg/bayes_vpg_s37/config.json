@@ -5,30 +5,30 @@
             10
         ]
     },
-    "actor_critic":	"MLPActorCritic",
-    "env_fn":	"<function <lambda> at 0x7f44af755b90>",
-    "epochs":	5,
-    "exp_name":	"vpg",
+    "actor_critic":	"BayesMLPActorCritic",
+    "env_fn":	"<function <lambda> at 0x7f8bc44220e0>",
+    "epochs":	1000,
+    "exp_name":	"bayes_vpg",
     "gamma":	0.9,
     "lam":	0.97,
     "logger":	{
-        "<spinup.utils.logx.EpochLogger object at 0x7f44af775c90>":	{
+        "<spinup.utils.logx.EpochLogger object at 0x7f8bc415ec10>":	{
             "epoch_dict":	{},
-            "exp_name":	"vpg",
+            "exp_name":	"bayes_vpg",
             "first_row":	true,
             "log_current_row":	{},
             "log_headers":	[],
-            "output_dir":	"model/vpg/vpg_s37",
+            "output_dir":	"model/bayes_vpg/bayes_vpg_s37",
             "output_file":	{
-                "<_io.TextIOWrapper name='model/vpg/vpg_s37/progress.txt' mode='w' encoding='UTF-8'>":	{
+                "<_io.TextIOWrapper name='model/bayes_vpg/bayes_vpg_s37/progress.txt' mode='w' encoding='UTF-8'>":	{
                     "mode":	"w"
                 }
             }
         }
     },
     "logger_kwargs":	{
-        "exp_name":	"vpg",
-        "output_dir":	"model/vpg/vpg_s37"
+        "exp_name":	"bayes_vpg",
+        "output_dir":	"model/bayes_vpg/bayes_vpg_s37"
     },
     "max_ep_len":	100,
     "pi_lr":	0.0003,

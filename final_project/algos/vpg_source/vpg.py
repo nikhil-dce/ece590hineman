@@ -8,6 +8,7 @@ from spinup.utils.logx import EpochLogger
 from spinup.utils.mpi_pytorch import setup_pytorch_for_mpi, sync_params, mpi_avg_grads
 from spinup.utils.mpi_tools import mpi_fork, mpi_avg, proc_id, mpi_statistics_scalar, num_procs
 
+from algos.vpg_source.custom_actor_critic import BayesMLPCritic
 class VPGBuffer:
     """
     A buffer for storing trajectories experienced by a VPG agent interacting
@@ -251,7 +252,14 @@ def vpg(env_fn, actor_critic=core.MLPActorCritic, ac_kwargs=dict(),  seed=0,
         for i in range(train_v_iters):
             vf_optimizer.zero_grad()
             loss_v = compute_loss_v(data)
-            loss_v.backward()
+            
+            bayes_kl_loss = 0.
+            if isinstance(ac.v, BayesMLPCritic):
+                bayes_kl_loss = ac.v.compute_kl()
+
+            total_loss_v = loss_v + bayes_kl_loss / data['obs'].shape[0]
+            total_loss_v.backward()
+            
             mpi_avg_grads(ac.v)    # average grads across MPI processes
             vf_optimizer.step()
 
@@ -260,7 +268,8 @@ def vpg(env_fn, actor_critic=core.MLPActorCritic, ac_kwargs=dict(),  seed=0,
         logger.store(LossPi=pi_l_old, LossV=v_l_old,
                      KL=kl, Entropy=ent,
                      DeltaLossPi=(loss_pi.item() - pi_l_old),
-                     DeltaLossV=(loss_v.item() - v_l_old))
+                     DeltaLossV=(loss_v.item() - v_l_old),
+                     BayesKL=bayes_kl_loss)
 
     # Prepare for interaction with environment
     start_time = time.time()
@@ -323,6 +332,7 @@ def vpg(env_fn, actor_critic=core.MLPActorCritic, ac_kwargs=dict(),  seed=0,
             logger.log_tabular('DeltaLossV', average_only=True)
             logger.log_tabular('Entropy', average_only=True)
             logger.log_tabular('KL', average_only=True)
+            logger.log_tabular('BayesKL', average_only=True)
             logger.log_tabular('Time', time.time()-start_time)
             logger.dump_tabular()
     
